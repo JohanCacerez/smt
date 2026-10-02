@@ -18,12 +18,13 @@ import {
   LogOut,
   LogIn,
 } from "lucide-react";
+// Importamos NavLink de react-router-dom
+import { NavLink } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStorage";
 
 export const Navigation = () => {
   const { user, isAuthenticated, logout, login } = useAuthStore();
 
-  // Simulación rápida para alternar sesión en pruebas de desarrollo
   const handleSimulateLogin = () => {
     login({
       id: "u-101",
@@ -42,71 +43,84 @@ export const Navigation = () => {
       className="shadow-sm py-2"
     >
       <Container fluid className="px-lg-4">
-        {/* Lado Izquierdo: Marca de la aplicación */}
         <Navbar.Brand
-          href="#home"
+          as={NavLink}
+          to="/"
           className="d-flex align-items-center gap-2 fw-bold text-uppercase tracking-wider"
         >
           <Cpu size={24} className="text-primary" />
           <span>SMT Control</span>
         </Navbar.Brand>
 
-        {/* Botón responsive para pantallas móviles */}
         <Navbar.Toggle aria-controls="main-navbar-nav" />
 
         <Navbar.Collapse id="main-navbar-nav">
-          {/* Centro: Módulos de la Aplicación */}
           <Nav className="mx-auto my-2 my-lg-0 gap-lg-1">
-            <Nav.Link
-              href="#dashboard"
-              className={`d-flex align-items-center gap-1 ${!isAuthenticated ? "disabled text-secondary" : ""}`}
+            {/* 
+              Renderizamos directamente el NavLink de React Router.
+              Le aplicamos las clases de Bootstrap ("nav-link") manualmente.
+            */}
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `nav-link d-flex align-items-center gap-1 ${isActive ? "active" : ""} ${!isAuthenticated ? "disabled text-secondary" : ""}`
+              }
             >
               <LayoutDashboard size={18} />
               <span>Dashboard</span>
-            </Nav.Link>
+            </NavLink>
 
-            <Nav.Link
-              href="#lineas"
-              className={`d-flex align-items-center gap-1 ${!isAuthenticated ? "disabled text-secondary" : ""}`}
+            <NavLink
+              to="/lineas"
+              className={({ isActive }) =>
+                `nav-link d-flex align-items-center gap-1 ${isActive ? "active" : ""} ${!isAuthenticated ? "disabled text-secondary" : ""}`
+              }
             >
               <GitBranch size={18} />
               <span>Líneas</span>
-            </Nav.Link>
+            </NavLink>
 
-            <Nav.Link
-              href="#procesos"
-              className={`d-flex align-items-center gap-1 ${!isAuthenticated ? "disabled text-secondary" : ""}`}
+            <NavLink
+              to="/procesos"
+              className={({ isActive }) =>
+                `nav-link d-flex align-items-center gap-1 ${isActive ? "active" : ""} ${!isAuthenticated ? "disabled text-secondary" : ""}`
+              }
             >
               <Workflow size={18} />
               <span>Procesos</span>
-            </Nav.Link>
+            </NavLink>
 
-            <Nav.Link
-              href="#tickets"
-              className={`d-flex align-items-center gap-1 ${!isAuthenticated ? "disabled text-secondary" : ""}`}
+            <NavLink
+              to="/tickets"
+              className={({ isActive }) =>
+                `nav-link d-flex align-items-center gap-1 ${isActive ? "active" : ""} ${!isAuthenticated ? "disabled text-secondary" : ""}`
+              }
             >
               <TicketCheck size={18} />
               <span>Tickets</span>
-            </Nav.Link>
+            </NavLink>
 
-            <Nav.Link
-              href="#equipo"
-              className={`d-flex align-items-center gap-1 ${!isAuthenticated ? "disabled text-secondary" : ""}`}
+            <NavLink
+              to="/equipo"
+              className={({ isActive }) =>
+                `nav-link d-flex align-items-center gap-1 ${isActive ? "active" : ""} ${!isAuthenticated ? "disabled text-secondary" : ""}`
+              }
             >
               <Users size={18} />
               <span>Equipo</span>
-            </Nav.Link>
+            </NavLink>
 
-            <Nav.Link
-              href="#configuracion"
-              className={`d-flex align-items-center gap-1 ${!isAuthenticated ? "disabled text-secondary" : ""}`}
+            <NavLink
+              to="/configuracion"
+              className={({ isActive }) =>
+                `nav-link d-flex align-items-center gap-1 ${isActive ? "active" : ""} ${!isAuthenticated ? "disabled text-secondary" : ""}`
+              }
             >
               <Settings size={18} />
               <span>Configuración</span>
-            </Nav.Link>
+            </NavLink>
           </Nav>
 
-          {/* Lado Derecho: Menú de Usuario o Iniciar Sesión */}
           <Nav className="align-items-center">
             {isAuthenticated && user ? (
               <NavDropdown
@@ -134,13 +148,14 @@ export const Navigation = () => {
                   </Badge>
                 </div>
 
-                <NavDropdown.Item
-                  href="#perfil"
-                  className="d-flex align-items-center gap-2 py-2"
+                {/* Para los items del dropdown aplicamos la misma lógica */}
+                <NavLink
+                  to="/perfil"
+                  className="dropdown-item d-flex align-items-center gap-2 py-2"
                 >
                   <User size={16} />
                   <span>Acceder al Usuario</span>
-                </NavDropdown.Item>
+                </NavLink>
 
                 <NavDropdown.Divider />
 
