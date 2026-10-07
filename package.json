@@ -15,6 +15,7 @@
     "lucide-react": "^1.49.0",
     "react": "^19.2.8",
     "react-bootstrap": "^2.10.10",
+    "react-data-table-component": "^8.11.0",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.4",
     "zustand": "^5.0.15"

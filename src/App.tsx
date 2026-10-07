@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Navigation } from "./components/Navigation";
 import { Home } from "./pages/Home";
 
+import AllUsers from "./pages/Users/AllUsers";
+
 // Simulación de páginas/componentes para las nuevas rutas
 // (Puedes mover estos componentes a sus propios archivos en la carpeta /pages más adelante)
 const Dashboard = () => (
@@ -72,6 +74,9 @@ function App() {
             <Route path="/equipo" element={<Equipo />} />
             <Route path="/configuracion" element={<Configuracion />} />
             <Route path="/perfil" element={<Perfil />} />
+
+            {/* Rutas de usuario */}
+            <Route path="/all_users" element={<AllUsers />} />
 
             {/* Redirección por defecto si el usuario entra a una ruta que no existe */}
             <Route path="*" element={<Navigate to="/" replace />} />
