@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Navigation } from "./components/Navigation";
 import { Home } from "./pages/Home";
 
-import AllUsers from "./pages/Users/AllUsers";
+import { AllUsers } from "./pages/Users/AllUsers";
 
 // Simulación de páginas/componentes para las nuevas rutas
 // (Puedes mover estos componentes a sus propios archivos en la carpeta /pages más adelante)
