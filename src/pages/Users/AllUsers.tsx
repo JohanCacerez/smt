@@ -3,7 +3,8 @@ import DataTable, { type TableColumn } from "react-data-table-component";
 import { X, Pencil } from "lucide-react";
 import { supabase } from "../../supabaseClient";
 import { AddUser } from "../../components/modals/AddUser";
-import { EditUser } from "../../components/modals/EditUser"; // 1. Importamos el modal de edición
+import { EditUser } from "../../components/modals/EditUser";
+import { DeleteUser } from "../../components/modals/DeleteUser"; // 1. Importamos el modal de borrado
 
 interface UserTable {
   id: number;
@@ -21,11 +22,12 @@ export const AllUsers = () => {
   const [users, setUsers] = useState<UserTable[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Controles para el Modal de Agregar
+  // Controles para los Modales
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
-  // 2. Controles para el Modal de Editar
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+
+  // 2. Controles para el Modal de Eliminación
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<UserTable | null>(null);
 
   const fetchUsers = async () => {
@@ -62,10 +64,15 @@ export const AllUsers = () => {
     fetchUsers();
   }, []);
 
-  // 3. Modificamos la función handleEdit para abrir el modal con el usuario seleccionado
   const handleEdit = (user: UserTable) => {
     setSelectedUser(user);
     setIsEditModalOpen(true);
+  };
+
+  // 3. Función para abrir el modal de confirmación de borrado
+  const handleDeleteClick = (user: UserTable) => {
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
   };
 
   const columns: TableColumn<UserTable>[] = [
@@ -105,16 +112,16 @@ export const AllUsers = () => {
       width: "150px",
       cell: (row) => (
         <section className="d-flex align-items-center py-2">
-          {/* 4. Pasamos la fila (row) completa al hacer clic en editar */}
           <button
             className="btn btn-primary me-2"
             onClick={() => handleEdit(row)}
           >
             <Pencil size={16} />
           </button>
+          {/* 4. Cambiamos el comportamiento del botón eliminar */}
           <button
             className="btn btn-danger"
-            onClick={() => console.log(`Delete user with email: ${row.email}`)}
+            onClick={() => handleDeleteClick(row)}
           >
             <X size={16} />
           </button>
@@ -161,15 +168,40 @@ export const AllUsers = () => {
         onUserAdded={fetchUsers}
       />
 
-      {/* 5. Renderizamos el Modal para Editar */}
+      {/* Modal para Editar */}
+      <EditUser
+        show={isEditModalOpen}
+        user={selectedUser}
+        onClose={() => setIsEditModalOpen(false)}
+        onUserUpdated={fetchUsers}
+      />
+
+      {/* Modal para Eliminar */}
+      <DeleteUser
+        show={isDeleteModalOpen}
+        user={selectedUser}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onUserDeleted={fetchUsers}
+      />
       <EditUser
         show={isEditModalOpen}
         user={selectedUser}
         onClose={() => {
           setIsEditModalOpen(false);
-          setSelectedUser(null); // Limpiamos el usuario al cerrar
+          setSelectedUser(null);
         }}
         onUserUpdated={fetchUsers}
+      />
+
+      {/* 5. Renderizamos el Modal para Eliminar */}
+      <DeleteUser
+        show={isDeleteModalOpen}
+        user={selectedUser}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedUser(null);
+        }}
+        onUserDeleted={fetchUsers}
       />
     </div>
   );
