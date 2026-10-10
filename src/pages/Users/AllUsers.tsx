@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import DataTable, { type TableColumn } from "react-data-table-component";
 import { X, Pencil } from "lucide-react";
 
+import { AddUser } from "../../components/modals/AddUser"; // Ajusta la ruta según tu proyecto
+
 // 1. Importa tu cliente de Supabase configurado
 import { supabase } from "../../supabaseClient"; // Ajusta la ruta de importación según tu proyecto
 
@@ -23,6 +25,8 @@ export const AllUsers = () => {
   // Iniciamos loading en true para no tener que activarlo síncronamente en el useEffect
   const [users, setUsers] = useState<UserTable[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   // 3. Función para obtener los datos desde Supabase
   const fetchUsers = async () => {
@@ -131,7 +135,7 @@ export const AllUsers = () => {
         </div>
         <button
           className="btn btn-success mb-3"
-          onClick={() => console.log("Add new user")}
+          onClick={() => setIsModalOpen(true)}
         >
           Agregar Usuario
         </button>
@@ -152,6 +156,11 @@ export const AllUsers = () => {
           noDataComponent="No se encontraron usuarios"
         />
       )}
+      <AddUser
+        show={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onUserAdded={fetchUsers} // Al agregar un usuario, refresca la tabla automáticamente
+      />
     </div>
   );
 };
