@@ -5,6 +5,7 @@ import { Navigation } from "./components/Navigation";
 import { Home } from "./pages/Home";
 
 import { AllUsers } from "./pages/Users/AllUsers";
+import { Login } from "./pages/Login";
 
 // Simulación de páginas/componentes para las nuevas rutas
 // (Puedes mover estos componentes a sus propios archivos en la carpeta /pages más adelante)
@@ -74,6 +75,7 @@ function App() {
             <Route path="/equipo" element={<Equipo />} />
             <Route path="/configuracion" element={<Configuracion />} />
             <Route path="/perfil" element={<Perfil />} />
+            <Route path="/login" element={<Login />} />
 
             {/* Rutas de usuario */}
             <Route path="/all_users" element={<AllUsers />} />

@@ -18,20 +18,28 @@ import {
   LogOut,
   LogIn,
 } from "lucide-react";
-// Importamos NavLink de react-router-dom
-import { NavLink } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStorage";
+
+// Importamos NavLink y useNavigate de react-router-dom
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
+import { supabase } from "../supabaseClient"; // Ajusta la ruta
 
 export const Navigation = () => {
-  const { user, isAuthenticated, logout, login } = useAuthStore();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuthStore();
 
-  const handleSimulateLogin = () => {
-    login({
-      id: "u-101",
-      name: "Johan Cacerez",
-      email: "caj3cea@bosch.com",
-      role: "Supervisor de Mantenimiento",
-    });
+  const handleLogout = async () => {
+    try {
+      // 1. Cerramos la sesión en Supabase
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Error al cerrar sesión en Supabase:", error);
+    } finally {
+      // 2. Limpiamos el Store de Zustand y el LocalStorage
+      logout();
+      // 3. Redireccionamos a la pantalla de login o inicio
+      navigate("/login");
+    }
   };
 
   return (
@@ -56,10 +64,7 @@ export const Navigation = () => {
 
         <Navbar.Collapse id="main-navbar-nav">
           <Nav className="mx-auto my-2 my-lg-0 gap-lg-1">
-            {/* 
-              Renderizamos directamente el NavLink de React Router.
-              Le aplicamos las clases de Bootstrap ("nav-link") manualmente.
-            */}
+            {/* NavLinks condicionados por autenticación */}
             <NavLink
               to="/dashboard"
               className={({ isActive }) =>
@@ -100,15 +105,18 @@ export const Navigation = () => {
               <span>Tickets</span>
             </NavLink>
 
-            <NavLink
-              to="/equipo"
-              className={({ isActive }) =>
-                `nav-link d-flex align-items-center gap-1 ${isActive ? "active" : ""} ${!isAuthenticated ? "disabled text-secondary" : ""}`
-              }
-            >
-              <Users size={18} />
-              <span>Equipo</span>
-            </NavLink>
+            {/* Solo mostramos la pestaña 'Equipo' (Gestión de Usuarios) si es Administrador */}
+            {isAuthenticated && user?.role_name === "Administrador" && (
+              <NavLink
+                to="/equipo"
+                className={({ isActive }) =>
+                  `nav-link d-flex align-items-center gap-1 ${isActive ? "active" : ""}`
+                }
+              >
+                <Users size={18} />
+                <span>Equipo</span>
+              </NavLink>
+            )}
 
             <NavLink
               to="/configuracion"
@@ -143,12 +151,12 @@ export const Navigation = () => {
                   <div className="text-truncate" style={{ maxWidth: "200px" }}>
                     {user.email}
                   </div>
+                  {/* Leemos la propiedad de rol mapeada por Zustand */}
                   <Badge bg="info" className="mt-1">
-                    {user.role}
+                    {user.role_name}
                   </Badge>
                 </div>
 
-                {/* Para los items del dropdown aplicamos la misma lógica */}
                 <NavLink
                   to="/perfil"
                   className="dropdown-item d-flex align-items-center gap-2 py-2"
@@ -159,8 +167,9 @@ export const Navigation = () => {
 
                 <NavDropdown.Divider />
 
+                {/* Usamos el cierre de sesión real integrado con Supabase */}
                 <NavDropdown.Item
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="d-flex align-items-center gap-2 text-danger py-2"
                 >
                   <LogOut size={16} />
@@ -171,7 +180,7 @@ export const Navigation = () => {
               <Button
                 variant="outline-light"
                 size="sm"
-                onClick={handleSimulateLogin}
+                onClick={() => navigate("/login")}
                 className="d-inline-flex align-items-center gap-2"
               >
                 <LogIn size={16} />

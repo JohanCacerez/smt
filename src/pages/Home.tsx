@@ -1,17 +1,7 @@
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
-import {
-  ShieldAlert,
-  LogIn,
-  Cpu,
-  CheckCircle2,
-  Activity,
-  Layers,
-} from "lucide-react";
-import { useAuthStore } from "../store/useAuthStorage";
+import { Container, Row, Col, Card } from "react-bootstrap";
+import { Cpu, Activity, Layers } from "lucide-react";
 
 export const Home = () => {
-  const { isAuthenticated, user, login } = useAuthStore();
-
   return (
     <div className="bg-light min-vh-100 py-5">
       <Container>
@@ -33,61 +23,7 @@ export const Home = () => {
         </Row>
 
         {/* Alerta de Control de Acceso según el estado de la sesión */}
-        <Row className="justify-content-center">
-          <Col md={8} lg={7}>
-            {!isAuthenticated ? (
-              <Card className="border-0 shadow-sm border-start border-warning border-4">
-                <Card.Body className="p-4 text-center">
-                  <div className="d-flex justify-content-center mb-3 text-warning">
-                    <ShieldAlert size={40} />
-                  </div>
-                  <h4 className="fw-semibold text-dark">Acceso Restringido</h4>
-                  <p className="text-muted mb-4">
-                    Para visualizar el estado de las líneas, registrar paros
-                    técnicos o gestionar los tickets de mantenimiento, es
-                    necesario contar con una sesión activa en el sistema.
-                  </p>
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="d-inline-flex align-items-center gap-2 px-4 shadow-sm"
-                    onClick={() =>
-                      login({
-                        id: "u-101",
-                        name: "Johan Cacerez",
-                        email: "caj3cea@bosch.com",
-                        role: "Supervisor de Mantenimiento",
-                      })
-                    }
-                  >
-                    <LogIn size={20} />
-                    <span>Iniciar Sesión en el Portal</span>
-                  </Button>
-                </Card.Body>
-              </Card>
-            ) : (
-              <Card className="border-0 shadow-sm border-start border-success border-4">
-                <Card.Body className="p-4">
-                  <div className="d-flex align-items-center gap-3">
-                    <div className="text-success">
-                      <CheckCircle2 size={36} />
-                    </div>
-                    <div>
-                      <h5 className="fw-bold mb-1">
-                        Sesión Activa: {user?.name}
-                      </h5>
-                      <p className="text-muted mb-0 small">
-                        Tienes acceso autorizado con el rol de{" "}
-                        <strong>{user?.role}</strong>. Puedes navegar por
-                        cualquiera de los módulos desde la barra superior.
-                      </p>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
-            )}
-          </Col>
-        </Row>
+        <Row className="justify-content-center"></Row>
 
         {/* Resumen rápido de módulos disponibles */}
         <Row className="justify-content-center mt-5 g-4 text-center">
