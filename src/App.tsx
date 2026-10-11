@@ -6,6 +6,9 @@ import { Navigation } from "./components/Navigation";
 import { Home } from "./pages/Home";
 import { AllUsers } from "./pages/Users/AllUsers";
 import { Login } from "./pages/Login";
+import { Process } from "./pages/Process"; // Importa la página de procesos SMT
+
+import { ProcessDetail } from "./pages/ProcessDetail";
 
 // 2. Importamos los componentes de protección de rutas
 import { ProtectedRoute } from "./components/ProtectedRoute"; // Ajusta la ruta si es necesario
@@ -22,12 +25,6 @@ const Lineas = () => (
   <div className="container mt-4">
     <h2>Líneas de Producción</h2>
     <p>Estado de las líneas SMT.</p>
-  </div>
-);
-const Procesos = () => (
-  <div className="container mt-4">
-    <h2>Flujos y Procesos</h2>
-    <p>Administración de procesos de manufactura.</p>
   </div>
 );
 const Tickets = () => (
@@ -75,7 +72,8 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/lineas" element={<Lineas />} />
-              <Route path="/procesos" element={<Procesos />} />
+              <Route path="/procesos" element={<Process />} />
+              <Route path="/procesos/:id" element={<ProcessDetail />} />
               <Route path="/tickets" element={<Tickets />} />
               <Route path="/equipo" element={<Equipo />} />
               <Route path="/configuracion" element={<Configuracion />} />
