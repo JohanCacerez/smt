@@ -59,20 +59,20 @@ Agrega la importación de tu nuevo componente en la sección de _imports_ superi
 import { SPP } from "./processes/SPP";
 // Importa aquí tu nuevo componente:
 // import { NuevoComponente } from "./processes/NuevoComponente";
-```
 
 // 1. Mapeo dinámico de componentes por ID de proceso
 const paginasDeProcesos: Record<string, React.ComponentType> = {
-"1": SPP, // Si el ID en Supabase es "1", carga el componente SPP
+  "1": SPP, // Si el ID en Supabase es "1", carga el componente SPP
 
-// 💡 Ejemplo de cómo añadir el tuyo en el futuro:
-// "1300": NuevoComponente,
+  // 💡 Ejemplo de cómo añadir el tuyo en el futuro:
+  // "1300": NuevoComponente,
 };
 // 2. Diccionario de nombres de procesos (como fallback para la vista de desarrollo)
 const nombresDeProcesos: Record<string, string> = {
-"1": "Impresión de Soldadura",
-"2": "SPI (Solder Paste Inspection)",
-"3": "Pick and Place (Montaje)",
-"4": "Horno de Reflujo",
-// "1300": "Nombre del Nuevo Proceso",
+  "1": "Impresión de Soldadura",
+  "2": "SPI (Solder Paste Inspection)",
+  "3": "Pick and Place (Montaje)",
+  "4": "Horno de Reflujo",
+  // "1300": "Nombre del Nuevo Proceso",
 };
+```
