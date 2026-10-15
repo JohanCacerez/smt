@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Activity, ClipboardList, PenTool, Database } from "lucide-react";
+import { CircleGauge, PackageCheck, RobotArm, Database } from "lucide-react";
 
 export const SPPSidebar = () => {
   return (
@@ -19,35 +19,35 @@ export const SPPSidebar = () => {
             `nav-link d-flex align-items-center gap-2 rounded py-2 px-3 text-white-50 ${isActive ? "bg-primary text-white active" : "hover-bg-light"}`
           }
         >
-          <Activity size={18} />
-          <span>Monitor de Pasta</span>
+          <CircleGauge size={18} />
+          <span>Dashboard</span>
         </NavLink>
         <NavLink
-          to="/procesos/1/limpieza"
+          to="/procesos/1/machines"
           className={({ isActive }) =>
             `nav-link d-flex align-items-center gap-2 rounded py-2 px-3 text-white-50 ${isActive ? "bg-primary text-white active" : "hover-bg-light"}`
           }
         >
-          <PenTool size={18} />
-          <span>Ciclos de Limpieza</span>
+          <RobotArm size={18} />
+          <span>Equipos</span>
         </NavLink>
         <NavLink
-          to="/procesos/1/stencils"
+          to="/procesos/1/bd_herramental"
           className={({ isActive }) =>
             `nav-link d-flex align-items-center gap-2 rounded py-2 px-3 text-white-50 ${isActive ? "bg-primary text-white active" : "hover-bg-light"}`
           }
         >
           <Database size={18} />
-          <span>Inventario Stencils</span>
+          <span>BD de herramental</span>
         </NavLink>
         <NavLink
-          to="/procesos/1/calibracion"
+          to="/procesos/1/gheekra"
           className={({ isActive }) =>
             `nav-link d-flex align-items-center gap-2 rounded py-2 px-3 text-white-50 ${isActive ? "bg-primary text-white active" : "hover-bg-light"}`
           }
         >
-          <ClipboardList size={18} />
-          <span>Presión de Rasquetas</span>
+          <PackageCheck size={18} />
+          <span>E/S de herramental</span>
         </NavLink>
       </nav>
     </div>

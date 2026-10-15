@@ -8,6 +8,7 @@ import { AllUsers } from "./pages/Users/AllUsers";
 import { Login } from "./pages/Login";
 import { Process } from "./pages/Process"; // Importa la página de procesos SMT
 import { ProcessDetail } from "./pages/ProcessDetail";
+import BdHerramental from "./pages/processes/SPP/BdHerramental";
 
 // Importamos el nuevo Layout de Procesos
 import { ProcessLayout } from "./components/ProcessLayout";
@@ -54,33 +55,6 @@ const Perfil = () => (
   </div>
 );
 
-// Páginas exclusivas para las herramientas de la Impresora de Soldadura (Proceso 1)
-const LimpiezaProceso1 = () => (
-  <div className="container mt-2">
-    <h3 className="fw-bold">Ciclos de Limpieza de Stencil (SP)</h3>
-    <p className="text-muted">
-      Registro de consumos de solvente, papel de limpieza y frecuencias de
-      barrido.
-    </p>
-  </div>
-);
-const StencilsProceso1 = () => (
-  <div className="container mt-2">
-    <h3 className="fw-bold">Inventario de Stencils</h3>
-    <p className="text-muted">
-      Estado de tensión, grosor y número de disparos realizados por herramental.
-    </p>
-  </div>
-);
-const CalibracionProceso1 = () => (
-  <div className="container mt-2">
-    <h3 className="fw-bold">Calibración de Rasquetas</h3>
-    <p className="text-muted">
-      Ajuste de presión (kg) y ángulo de ataque de las hojas metálicas.
-    </p>
-  </div>
-);
-
 function App() {
   return (
     // Envolvemos toda la aplicación en el BrowserRouter
@@ -112,9 +86,7 @@ function App() {
                 <Route index element={<ProcessDetail />} />
 
                 {/* Subrutas del Proceso 1 (Navegadas desde el ImpresionSidebar) */}
-                <Route path="limpieza" element={<LimpiezaProceso1 />} />
-                <Route path="stencils" element={<StencilsProceso1 />} />
-                <Route path="calibracion" element={<CalibracionProceso1 />} />
+                <Route path="bd_herramental" element={<BdHerramental />} />
               </Route>
 
               <Route path="/tickets" element={<Tickets />} />
