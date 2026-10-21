@@ -1,6 +1,8 @@
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { Container, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Activity, ShieldCheck, AlertTriangle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+
+import ToolingStatus from "../../components/widgets/ToolingStatus";
 
 export const SPP = () => {
   const navigate = useNavigate();
@@ -24,53 +26,7 @@ export const SPP = () => {
           soldadura.
         </p>
       </div>
-
-      <Row className="g-4">
-        {/* Card de Rendimiento */}
-        <Col xs={12} md={4}>
-          <Card className="border-0 shadow-sm p-3 bg-white rounded-4">
-            <Card.Body className="d-flex align-items-center gap-3">
-              <div className="bg-success bg-opacity-10 p-3 rounded-3 text-success">
-                <Activity size={24} />
-              </div>
-              <div>
-                <h6 className="text-muted mb-1">Rendimiento (OEE)</h6>
-                <h3 className="fw-bold mb-0">98.4%</h3>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Card de Alertas */}
-        <Col xs={12} md={4}>
-          <Card className="border-0 shadow-sm p-3 bg-white rounded-4">
-            <Card.Body className="d-flex align-items-center gap-3">
-              <div className="bg-warning bg-opacity-10 p-3 rounded-3 text-warning">
-                <AlertTriangle size={24} />
-              </div>
-              <div>
-                <h6 className="text-muted mb-1">Alertas Activas</h6>
-                <h3 className="fw-bold mb-0">2 Advertencias</h3>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Card de Estado del Stencil */}
-        <Col xs={12} md={4}>
-          <Card className="border-0 shadow-sm p-3 bg-white rounded-4">
-            <Card.Body className="d-flex align-items-center gap-3">
-              <div className="bg-info bg-opacity-10 p-3 rounded-3 text-info">
-                <ShieldCheck size={24} />
-              </div>
-              <div>
-                <h6 className="text-muted mb-1">Vida de Limpieza Stencil</h6>
-                <h3 className="fw-bold mb-0">85%</h3>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      <ToolingStatus />
     </Container>
   );
 };
