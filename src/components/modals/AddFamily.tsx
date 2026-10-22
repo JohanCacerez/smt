@@ -25,7 +25,7 @@ export default function AddFamily({ show, onHide, onSuccess }: AddFamilyProps) {
     onHide();
   };
 
-  // Guardar Familia en Supabase con validación de duplicados
+  // Guardar Familia en Supabase con validación de duplicados (Llamada única controlada)
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const cleanName = familyName.trim();
@@ -33,9 +33,9 @@ export default function AddFamily({ show, onHide, onSuccess }: AddFamilyProps) {
 
     setIsSubmitting(true);
 
-    // Definimos la promesa con la validación interna
-    const guardarFamiliaPromesa = async () => {
-      // 1. Validar si ya existe una familia con ese mismo nombre
+    // 1. Definimos la lógica asíncrona de inserción
+    const guardarFamilia = async () => {
+      // Validar si ya existe una familia con ese mismo nombre
       const { data: existingFamily, error: fetchError } = await supabase
         .from("families")
         .select("id")
@@ -48,7 +48,7 @@ export default function AddFamily({ show, onHide, onSuccess }: AddFamilyProps) {
         throw new Error(`La familia "${cleanName}" ya está registrada.`);
       }
 
-      // 2. Si no existe, procedemos a insertar el registro
+      // Si no existe, procedemos a insertar el registro de forma única
       const { data, error: insertError } = await supabase
         .from("families")
         .insert([{ name: cleanName }])
@@ -58,15 +58,19 @@ export default function AddFamily({ show, onHide, onSuccess }: AddFamilyProps) {
       return data;
     };
 
-    // Lanzamos el toast interactivo
-    toast.promise(guardarFamiliaPromesa(), {
+    // 2. Iniciamos el envío de red UNA sola vez y guardamos la referencia de la promesa
+    const promesaUnica = guardarFamilia();
+
+    // 3. Vinculamos el Toaster a esa única promesa activa
+    toast.promise(promesaUnica, {
       loading: "Validando y registrando familia...",
-      success: "¡Nueva familia registrada con éxito!",
+      success: "¡Nueva familia registrada con éxito! 📂",
       error: (err) => `${err.message || err}`,
     });
 
     try {
-      await guardarFamiliaPromesa();
+      // Esperamos que la promesa única resuelva de forma exitosa
+      await promesaUnica;
       if (onSuccess) onSuccess();
       handleClose();
     } catch (error) {

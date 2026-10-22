@@ -63,6 +63,7 @@ export default function AddModel({ show, onHide, onSuccess }: AddModelProps) {
   };
 
   // Guardar nuevo modelo con validación de duplicados
+  // Guardar nuevo modelo con validación de duplicados (Corregido para envío único)
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const cleanModelName = modelName.trim().toUpperCase(); // Forzar mayúsculas para estandarización
@@ -72,8 +73,9 @@ export default function AddModel({ show, onHide, onSuccess }: AddModelProps) {
 
     setIsSubmitting(true);
 
-    const guardarModeloPromesa = async () => {
-      // 1. Validar que no exista otro modelo con el mismo nombre
+    // 1. Definimos la llamada a Supabase de manera limpia
+    const guardarModelo = async () => {
+      // Validar que no exista otro modelo con el mismo nombre
       const { data: existingModel, error: fetchError } = await supabase
         .from("models")
         .select("id")
@@ -88,13 +90,13 @@ export default function AddModel({ show, onHide, onSuccess }: AddModelProps) {
         );
       }
 
-      // 2. Insertar en la tabla 'models'
+      // Insertar en la tabla 'models'
       const { data, error: insertError } = await supabase
         .from("models")
         .insert([
           {
             name: cleanModelName,
-            id_family: familyId,
+            id_family: familyId, // Usamos tu columna 'id_family'
           },
         ])
         .select();
@@ -103,14 +105,19 @@ export default function AddModel({ show, onHide, onSuccess }: AddModelProps) {
       return data;
     };
 
-    toast.promise(guardarModeloPromesa(), {
+    // 2. Iniciamos la ejecución UNA Sola vez y guardamos la referencia en memoria
+    const promesaUnica = guardarModelo();
+
+    // 3. Vinculamos el Toaster a esa única promesa activa
+    toast.promise(promesaUnica, {
       loading: "Validando y registrando modelo...",
-      success: "¡Nuevo modelo registrado con éxito!",
+      success: "¡Nuevo modelo registrado con éxito! 🛠️",
       error: (err) => `${err.message || err}`,
     });
 
     try {
-      await guardarModeloPromesa();
+      // Esperamos que la promesa única termine
+      await promesaUnica;
       if (onSuccess) onSuccess();
       handleClose();
     } catch (error) {

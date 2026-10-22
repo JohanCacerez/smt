@@ -57,17 +57,34 @@ export default function AddTooling({
     e.preventDefault();
     setIsSubmitting(true);
 
-    // ⚡ Definimos la promesa de guardado en Supabase incluyendo las nuevas columnas
-    const guardarPromesa = async () => {
+    // 1. Creamos la función que realiza la llamada ÚNICA a Supabase
+    const registrarHerramental = async () => {
+      const cleanDmc = formData.dmc.trim().toUpperCase();
+
+      // Validación preventiva de duplicado (Local, antes de mandar el INSERT)
+      const { data: existCheck, error: fetchError } = await supabase
+        .from("tooling")
+        .select("id")
+        .eq("dmc", cleanDmc)
+        .maybeSingle();
+
+      if (fetchError) throw fetchError;
+      if (existCheck) {
+        throw new Error(
+          `El código DMC "${cleanDmc}" ya existe en el inventario.`,
+        );
+      }
+
+      // Inserción ÚNICA
       const { data, error } = await supabase
         .from("tooling")
         .insert([
           {
-            dmc: formData.dmc,
+            dmc: cleanDmc,
             type: formData.tipo,
             status: "Almacenado",
-            rack: formData.rack.trim().toUpperCase(), // Guardamos estandarizado en Mayúsculas
-            position: formData.position.trim().toUpperCase(), // Guardamos estandarizado en Mayúsculas
+            rack: formData.rack.trim().toUpperCase(),
+            position: formData.position.trim().toUpperCase(),
           },
         ])
         .select();
@@ -76,19 +93,24 @@ export default function AddTooling({
       return data;
     };
 
-    // ⚡ Ejecutamos toast.promise para manejar los 3 estados automáticamente
-    toast.promise(guardarPromesa(), {
+    // 2. Guardamos la ejecución de la promesa en una variable para dispararla UNA sola vez
+    const promesaUnica = registrarHerramental();
+
+    // 3. Pasamos esa promesa única tanto a toast.promise como al bloque try/await
+    toast.promise(promesaUnica, {
       loading: "Registrando herramental en la base de datos...",
       success: "¡Herramental registrado con éxito! 🎉",
-      error: (err) => `Error al registrar: ${err.message || err}`,
+      error: (err) => `${err.message || err}`,
     });
 
     try {
-      await guardarPromesa();
+      // Esperamos la resolución de la promesa única que ya se está ejecutando
+      await promesaUnica;
+
       if (onSuccess) onSuccess();
       handleClose();
     } catch (error) {
-      console.error("Error al registrar en Supabase:", error);
+      console.error("Error en el registro único de Supabase:", error);
     } finally {
       setIsSubmitting(false);
     }
