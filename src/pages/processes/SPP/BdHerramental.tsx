@@ -13,7 +13,8 @@ import {
 import { Toaster } from "react-hot-toast";
 import AddTooling from "../../../components/modals/AddTooling";
 import InventoryTooling from "../../../components/modals/InventoryTooling";
-import ActionTooling from "../../../components/modals/ActionTooling"; // Importamos el nuevo modal de acción
+import ActionTooling from "../../../components/modals/ActionTooling";
+import EditTooling from "../../../components/modals/EditTooling"; // ⚡ Importamos el nuevo modal de edición
 
 interface SmtRowData {
   familia: string;
@@ -30,7 +31,8 @@ export default function BdHerramental() {
   // Estados para controlar los modales de forma independiente
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showInventoryModal, setShowInventoryModal] = useState<boolean>(false);
-  const [showActionModal, setShowActionModal] = useState<boolean>(false); // Nuevo estado
+  const [showActionModal, setShowActionModal] = useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false); // ⚡ Nuevo estado para el modal de edición
 
   const handleSuccess = () => {
     console.log("¡Acción procesada con éxito! Refrescando datos del sistema.");
@@ -127,7 +129,15 @@ export default function BdHerramental() {
               Agregar herramental
             </Dropdown.Item>
 
-            {/* ⚡ Reemplazamos 'Editar herramental' por 'Eliminar o mandar a Scrap' */}
+            {/* ⚡ Restablecemos 'Editar herramental' llamando al nuevo modal */}
+            <Dropdown.Item
+              onClick={() => setShowEditModal(true)}
+              className="d-flex align-items-center gap-2 text-warning fw-semibold"
+            >
+              <Edit size={16} />
+              Editar herramental
+            </Dropdown.Item>
+
             <Dropdown.Item
               onClick={() => setShowActionModal(true)}
               className="d-flex align-items-center gap-2 text-danger fw-semibold"
@@ -232,10 +242,17 @@ export default function BdHerramental() {
         onHide={() => setShowInventoryModal(false)}
       />
 
-      {/* ⚡ MODAL 3: ACCIONES ELIMINAR / SCRAP */}
+      {/* MODAL 3: ACCIONES ELIMINAR / SCRAP */}
       <ActionTooling
         show={showActionModal}
         onHide={() => setShowActionModal(false)}
+        onSuccess={handleSuccess}
+      />
+
+      {/* ⚡ MODAL 4: EDITAR HERRAMENTAL (NUEVO) */}
+      <EditTooling
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
         onSuccess={handleSuccess}
       />
     </div>

@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type ChangeEvent } from "react";
-import { Modal, Button, Form, Spinner } from "react-bootstrap";
-import { Wrench, Hash, Save, X } from "lucide-react";
+import { Modal, Button, Form, Spinner, Row, Col } from "react-bootstrap";
+import { Wrench, Hash, Save, X, MapPin } from "lucide-react";
 import { supabase } from "../../supabaseClient"; // Ajusta la ruta según tu estructura de archivos
 import { toast } from "react-hot-toast";
 
@@ -8,6 +8,8 @@ import { toast } from "react-hot-toast";
 export interface HerramentalFormData {
   dmc: string;
   tipo: string;
+  rack: string; // ⚡ Nuevo campo
+  position: string; // ⚡ Nuevo campo
 }
 
 // Propiedades que recibirá este componente
@@ -22,10 +24,12 @@ export default function AddTooling({
   onHide,
   onSuccess,
 }: AddToolingProps) {
-  // Estado local fuertemente tipado
+  // Estado local fuertemente tipado con los nuevos campos
   const [formData, setFormData] = useState<HerramentalFormData>({
     dmc: "",
     tipo: "",
+    rack: "", // Inicializamos vacíos
+    position: "",
   });
 
   // Estado para controlar el envío a la base de datos
@@ -44,7 +48,7 @@ export default function AddTooling({
 
   // Manejar el cierre y limpieza del formulario
   const handleClose = () => {
-    setFormData({ dmc: "", tipo: "" });
+    setFormData({ dmc: "", tipo: "", rack: "", position: "" });
     onHide();
   };
 
@@ -53,12 +57,18 @@ export default function AddTooling({
     e.preventDefault();
     setIsSubmitting(true);
 
-    // ⚡ Definimos la promesa de guardado en Supabase
+    // ⚡ Definimos la promesa de guardado en Supabase incluyendo las nuevas columnas
     const guardarPromesa = async () => {
       const { data, error } = await supabase
         .from("tooling")
         .insert([
-          { dmc: formData.dmc, type: formData.tipo, status: "Almacenado" },
+          {
+            dmc: formData.dmc,
+            type: formData.tipo,
+            status: "Almacenado",
+            rack: formData.rack.trim().toUpperCase(), // Guardamos estandarizado en Mayúsculas
+            position: formData.position.trim().toUpperCase(), // Guardamos estandarizado en Mayúsculas
+          },
         ])
         .select();
 
@@ -69,7 +79,7 @@ export default function AddTooling({
     // ⚡ Ejecutamos toast.promise para manejar los 3 estados automáticamente
     toast.promise(guardarPromesa(), {
       loading: "Registrando herramental en la base de datos...",
-      success: "¡Herramental registrado con éxito!",
+      success: "¡Herramental registrado con éxito! 🎉",
       error: (err) => `Error al registrar: ${err.message || err}`,
     });
 
@@ -101,8 +111,8 @@ export default function AddTooling({
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
           <p className="text-muted small">
-            Por favor escanea o ingresa el DMC único y selecciona el tipo de
-            herramental para su registro en el inventario.
+            Por favor escanea o ingresa el DMC único, selecciona el tipo de
+            herramental y su ubicación en el inventario.
           </p>
 
           {/* Campo DMC */}
@@ -140,6 +150,51 @@ export default function AddTooling({
               <option value="pasta">Pasta</option>
             </Form.Select>
           </Form.Group>
+
+          {/* ⚡ SECCIÓN VISUAL DE UBICACIÓN (RACK Y POSICIÓN) */}
+          <hr className="my-3 text-muted opacity-25" />
+          <Form.Label className="fw-semibold d-flex align-items-center gap-1 text-primary mb-3">
+            <MapPin size={18} />
+            Ubicación de Almacenamiento
+          </Form.Label>
+
+          <Row>
+            {/* Campo Rack */}
+            <Col md={6}>
+              <Form.Group className="mb-3" controlId="formRack">
+                <Form.Label className="small fw-semibold text-secondary">
+                  Rack
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="rack"
+                  placeholder="Ej: Rack A, Rack B"
+                  value={formData.rack}
+                  onChange={handleChange}
+                  required
+                  disabled={isSubmitting}
+                />
+              </Form.Group>
+            </Col>
+
+            {/* Campo Posición */}
+            <Col md={6}>
+              <Form.Group className="mb-3" controlId="formPosition">
+                <Form.Label className="small fw-semibold text-secondary">
+                  Posición / Slot
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="position"
+                  placeholder="Ej: 30T, 12B"
+                  value={formData.position}
+                  onChange={handleChange}
+                  required
+                  disabled={isSubmitting}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
         </Modal.Body>
 
         <Modal.Footer className="bg-light">

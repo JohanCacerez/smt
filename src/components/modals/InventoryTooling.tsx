@@ -10,16 +10,18 @@ import {
   InputGroup,
 } from "react-bootstrap";
 import DataTable, { type TableColumn } from "react-data-table-component";
-import { Eye, RefreshCw, X, Search, Filter } from "lucide-react";
+import { Eye, RefreshCw, X, Search, Filter, MapPin } from "lucide-react";
 import { supabase } from "../../supabaseClient"; // Ajusta la ruta a tu cliente de Supabase
 
-// Definición del tipo de datos para el herramental en Supabase
+// Definición del tipo de datos actualizado para incluir las nuevas columnas de Supabase
 interface ToolingItem {
   id: number;
   created_at?: string;
   dmc: string;
   type: string;
   status: string;
+  rack?: string; // ⚡ Agregado
+  position?: string; // ⚡ Agregado
 }
 
 interface ModalInventoryProps {
@@ -42,9 +44,10 @@ export default function InventoryTooling({
   const fetchInventory = async () => {
     setLoading(true);
     try {
+      // ⚡ Agregamos 'rack' y 'position' a la consulta SELECT
       const { data, error } = await supabase
         .from("tooling")
-        .select("id, dmc, type, status")
+        .select("id, dmc, type, status, rack, position")
         .order("id", { ascending: false });
 
       if (error) throw error;
@@ -119,7 +122,7 @@ export default function InventoryTooling({
       name: "ID",
       selector: (row) => row.id,
       sortable: true,
-      width: "80px",
+      width: "75px",
     },
     {
       name: "DMC / Número de Serie",
@@ -131,12 +134,32 @@ export default function InventoryTooling({
       name: "Tipo",
       selector: (row) => row.type,
       sortable: true,
+      width: "110px",
       cell: (row) => <span className="text-capitalize">{row.type}</span>,
+    },
+    {
+      name: "Ubicación", // ⚡ NUEVA COLUMNA DE UBICACIÓN COMBINADA
+      selector: (row) => `${row.rack || ""} - ${row.position || ""}`,
+      sortable: true,
+      width: "180px",
+      cell: (row) => (
+        <span className="d-flex align-items-center gap-1 text-secondary small">
+          <MapPin size={14} className="text-muted" />
+          {row.rack && row.position ? (
+            <span>
+              {row.rack} <strong className="text-dark">[{row.position}]</strong>
+            </span>
+          ) : (
+            <span className="text-muted italic">Sin asignar</span>
+          )}
+        </span>
+      ),
     },
     {
       name: "Estado",
       selector: (row) => row.status,
       sortable: true,
+      width: "120px",
       cell: (row) => renderStatus(row.status),
     },
   ];
