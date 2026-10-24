@@ -35,9 +35,10 @@ export default function DeleteModel({
 
     setIsSubmitting(true);
 
-    const eliminarModeloPromesa = async () => {
-      // 1. Validar primero si el modelo existe en la base de datos
-      const { data: existCheck, error: fetchError } = await supabase
+    // ⚡ Definimos la función de borrado de red único
+    const eliminarModeloYSetup = async () => {
+      // 1. Validar primero si el modelo existe en la base de datos y obtener su ID
+      const { data: modelData, error: fetchError } = await supabase
         .from("models")
         .select("id")
         .eq("name", targetModel)
@@ -45,29 +46,41 @@ export default function DeleteModel({
 
       if (fetchError) throw fetchError;
 
-      if (!existCheck) {
+      if (!modelData) {
         throw new Error(`El modelo "${targetModel}" no existe en el catálogo.`);
       }
 
-      // 2. Si existe, procedemos a borrarlo de Supabase
-      const { error: deleteError } = await supabase
+      // 2. ELIMINACIÓN DEL SETUP (Si es que tiene uno configurado)
+      const { error: setupDeleteError } = await supabase
+        .from("setups")
+        .delete()
+        .eq("model_id", modelData.id);
+
+      if (setupDeleteError) throw setupDeleteError;
+
+      // 3. ELIMINACIÓN DEL MODELO
+      const { error: modelDeleteError } = await supabase
         .from("models")
         .delete()
-        .eq("name", targetModel);
+        .eq("id", modelData.id);
 
-      if (deleteError) throw deleteError;
+      if (modelDeleteError) throw modelDeleteError;
+
       return targetModel;
     };
 
-    toast.promise(eliminarModeloPromesa(), {
-      loading: "Procesando baja en la base de datos...",
+    // ⚡ Lanzamos la promesa una sola vez
+    const promesaUnica = eliminarModeloYSetup();
+
+    toast.promise(promesaUnica, {
+      loading: "Procesando baja del modelo y recetas asociadas...",
       success: (name) =>
-        `Modelo "${name}" eliminado permanentemente del sistema.`,
+        `Modelo "${name}" y su setup asociados eliminados con éxito. 🗑️`,
       error: (err) => `${err.message || err}`,
     });
 
     try {
-      await eliminarModeloPromesa();
+      await promesaUnica;
       if (onSuccess) onSuccess();
       handleClose();
     } catch (error) {
@@ -105,11 +118,10 @@ export default function DeleteModel({
           >
             <AlertTriangle size={24} className="flex-shrink-0 text-danger" />
             <div>
-              <strong>¡Advertencia Crítica!</strong>
+              <strong>¡Advertencia Crítica de Trazabilidad!</strong>
               <div className="text-muted">
-                Esta acción es irreversible. Se borrará permanentemente el
-                número de parte y todas sus relaciones asociadas en la base de
-                datos de SMT.
+                Esta acción borrará permanentemente el modelo y la receta de su
+                <strong> setup de SMT</strong> asociado de forma automática.
               </div>
             </div>
           </Alert>

@@ -24,7 +24,7 @@ import {
   X,
 } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
-import { supabase } from "../../../supabaseClient"; // Ajusta la ruta a tu cliente de Supabase
+import { supabase } from "../../../supabaseClient";
 
 // Modales del sistema
 import AddTooling from "../../../components/modals/AddTooling";
@@ -36,8 +36,8 @@ import AddModel from "../../../components/modals/AddModel";
 import InventoryFamilies from "../../../components/modals/InventoryFamilies";
 import DeleteModel from "../../../components/modals/DeleteModel";
 import ConfigureSetup from "../../../components/modals/ConfigureSetup";
+import EditSetup from "../../../components/modals/EditSetup"; // ⚡ Importamos el nuevo modal de edición de setups
 
-// Interfaz para mapear los datos reales recibidos de Supabase (con sus Joins)
 interface SetupRowData {
   id: number;
   stencil_top: string;
@@ -45,6 +45,7 @@ interface SetupRowData {
   squeegee_front: string;
   squeegee_rear: string;
   base: string;
+  paste: string;
   families: { name: string }[] | { name: string } | null;
   models: { name: string }[] | { name: string } | null;
 }
@@ -73,12 +74,12 @@ export default function BdHerramental() {
     useState<boolean>(false);
   const [showConfigureSetupModal, setShowConfigureSetupModal] =
     useState<boolean>(false);
+  const [showEditSetupModal, setShowEditSetupModal] = useState<boolean>(false); // ⚡ Nuevo estado para edición de setups
 
-  // ⚡ Consultar los Setups y las Familias en Supabase
+  // Consultar los Setups y las Familias en Supabase
   const fetchData = async () => {
     setLoading(true);
     try {
-      // 1. Obtener setups cruzando tablas para traer nombres de Familias y Modelos
       const { data: setupsData, error: setupsError } = await supabase.from(
         "setups",
       ).select(`
@@ -95,7 +96,6 @@ export default function BdHerramental() {
 
       if (setupsError) throw setupsError;
 
-      // 2. Obtener familias para el filtro dropdown
       const { data: familiesData, error: familiesError } = await supabase
         .from("families")
         .select("id, name")
@@ -103,7 +103,6 @@ export default function BdHerramental() {
 
       if (familiesError) throw familiesError;
 
-      // Guardamos los datos de setups forzando el casteo al tipado compatible
       setSetups((setupsData as unknown as SetupRowData[]) || []);
       setFamilies(familiesData || []);
     } catch (error: unknown) {
@@ -116,39 +115,33 @@ export default function BdHerramental() {
     }
   };
 
-  // Carga inicial
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
   }, []);
 
   const handleSuccess = () => {
-    fetchData(); // Refrescar la tabla automáticamente cuando un modal guarde con éxito
+    fetchData(); // Sincroniza la tabla automáticamente al guardar cambios
   };
 
-  // ⚡ Lógica de filtrado en tiempo real en memoria (useMemo)
+  // Lógica de filtrado en tiempo real en memoria
   const filteredSetups = useMemo(() => {
     return setups.filter((setup) => {
-      // Extraemos el nombre de la familia validando si viene como array o como objeto directo
       const familyName = Array.isArray(setup.families)
         ? setup.families[0]?.name || ""
         : setup.families?.name || "";
 
-      // Extraemos el nombre del modelo de igual forma
       const modelName = Array.isArray(setup.models)
         ? setup.models[0]?.name || ""
         : setup.models?.name || "";
 
-      // 1. Filtro de Familia
       const matchesFamily =
         selectedFamilyName === "" || familyName === selectedFamilyName;
 
-      // 2. Filtro de Búsqueda de Modelo
       const matchesModel = modelName
         .toLowerCase()
         .includes(searchModel.toLowerCase().trim());
 
-      // 3. Filtro de Búsqueda por DMC de cualquier componente de la receta
       const dmcToSearch = searchDmc.toLowerCase().trim();
       const matchesDmc =
         dmcToSearch === "" ||
@@ -157,11 +150,11 @@ export default function BdHerramental() {
         setup.squeegee_front.toLowerCase().includes(dmcToSearch) ||
         setup.squeegee_rear.toLowerCase().includes(dmcToSearch) ||
         setup.base.toLowerCase().includes(dmcToSearch);
+
       return matchesFamily && matchesModel && matchesDmc;
     });
   }, [setups, selectedFamilyName, searchModel, searchDmc]);
 
-  // Tipado estricto para las columnas de la tabla real de Setups
   const columns: TableColumn<SetupRowData>[] = [
     {
       name: "Familia",
@@ -207,11 +200,7 @@ export default function BdHerramental() {
       selector: (row) => row.squeegee_rear,
       sortable: true,
     },
-    {
-      name: "Base Soporte",
-      selector: (row) => row.base,
-      sortable: true,
-    },
+    { name: "Base Soporte", selector: (row) => row.base, sortable: true },
   ];
 
   return (
@@ -283,7 +272,7 @@ export default function BdHerramental() {
         {/* DROPDOWN: FAMILIAS */}
         <Dropdown>
           <Dropdown.Toggle
-            variant="secondary"
+            variant="primary"
             id="dropdown-familias"
             className="d-flex align-items-center gap-1"
           >
@@ -308,7 +297,7 @@ export default function BdHerramental() {
         {/* DROPDOWN: MODELOS */}
         <Dropdown>
           <Dropdown.Toggle
-            variant="secondary"
+            variant="primary"
             id="dropdown-modelos"
             className="d-flex align-items-center gap-1"
           >
@@ -333,7 +322,7 @@ export default function BdHerramental() {
         {/* DROPDOWN: SETUP */}
         <Dropdown>
           <Dropdown.Toggle
-            variant="secondary"
+            variant="primary"
             id="dropdown-setup"
             className="d-flex align-items-center gap-1"
           >
@@ -346,18 +335,19 @@ export default function BdHerramental() {
             >
               <Plus size={16} /> Configurar nuevo setup
             </Dropdown.Item>
-            <Dropdown.Item className="d-flex align-items-center gap-2">
+            {/* ⚡ Vinculamos la acción de abrir modal de edición de setups */}
+            <Dropdown.Item
+              onClick={() => setShowEditSetupModal(true)}
+              className="d-flex align-items-center gap-2 text-warning fw-semibold"
+            >
               <Edit size={16} /> Editar setups
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </Stack>
 
-      {/* ========================================== */}
-      {/* SECCIÓN INTERACTIVA DE FILTROS EN PISO     */}
-      {/* ========================================== */}
+      {/* SECCIÓN INTERACTIVA DE FILTROS EN PISO */}
       <Row className="mb-3 g-2 bg-light p-3 rounded-3 shadow-sm border">
-        {/* Filtro: Buscar por Modelo */}
         <Col lg={4} md={6} sm={12}>
           <Form.Group controlId="filterModel">
             <Form.Label className="small fw-semibold text-secondary">
@@ -384,7 +374,6 @@ export default function BdHerramental() {
           </Form.Group>
         </Col>
 
-        {/* Filtro: Filtrar por Familia */}
         <Col lg={3} md={6} sm={12}>
           <Form.Group controlId="filterFamily">
             <Form.Label className="small fw-semibold text-secondary">
@@ -409,7 +398,6 @@ export default function BdHerramental() {
           </Form.Group>
         </Col>
 
-        {/* Filtro: Buscar por DMC de Herramental */}
         <Col lg={5} md={12} sm={12}>
           <Form.Group controlId="filterDmc">
             <Form.Label className="small fw-semibold text-secondary">
@@ -462,7 +450,7 @@ export default function BdHerramental() {
         />
       )}
 
-      {/* Modales del sistema */}
+      {/* Renderizado de Modales */}
       <AddTooling
         show={showAddModal}
         onHide={() => setShowAddModal(false)}
@@ -504,6 +492,13 @@ export default function BdHerramental() {
       <ConfigureSetup
         show={showConfigureSetupModal}
         onHide={() => setShowConfigureSetupModal(false)}
+        onSuccess={handleSuccess}
+      />
+
+      {/* ⚡ Renderizamos el nuevo modal de edición de setups */}
+      <EditSetup
+        show={showEditSetupModal}
+        onHide={() => setShowEditSetupModal(false)}
         onSuccess={handleSuccess}
       />
     </div>
