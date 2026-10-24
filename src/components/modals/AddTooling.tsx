@@ -169,7 +169,6 @@ export default function AddTooling({
               <option value="estencil">Esténcil</option>
               <option value="base">Base</option>
               <option value="navaja">Navaja</option>
-              <option value="pasta">Pasta</option>
             </Form.Select>
           </Form.Group>
 

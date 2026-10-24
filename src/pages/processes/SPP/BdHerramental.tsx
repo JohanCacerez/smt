@@ -45,7 +45,6 @@ interface SetupRowData {
   squeegee_front: string;
   squeegee_rear: string;
   base: string;
-  paste: string;
   families: { name: string }[] | { name: string } | null;
   models: { name: string }[] | { name: string } | null;
 }
@@ -157,9 +156,7 @@ export default function BdHerramental() {
         setup.stencil_bottom.toLowerCase().includes(dmcToSearch) ||
         setup.squeegee_front.toLowerCase().includes(dmcToSearch) ||
         setup.squeegee_rear.toLowerCase().includes(dmcToSearch) ||
-        setup.base.toLowerCase().includes(dmcToSearch) ||
-        setup.paste.toLowerCase().includes(dmcToSearch);
-
+        setup.base.toLowerCase().includes(dmcToSearch);
       return matchesFamily && matchesModel && matchesDmc;
     });
   }, [setups, selectedFamilyName, searchModel, searchDmc]);
@@ -214,12 +211,6 @@ export default function BdHerramental() {
       name: "Base Soporte",
       selector: (row) => row.base,
       sortable: true,
-    },
-    {
-      name: "Pasta Soldadura",
-      selector: (row) => row.paste,
-      sortable: true,
-      width: "140px",
     },
   ];
 

@@ -73,9 +73,6 @@ export default function ConfigureSetup({
   const [baseBks, setBaseBks] = useState<string[]>([]);
   const [isBaseValid, setIsBaseValid] = useState<boolean | null>(null);
 
-  const [paste, setPaste] = useState<string>("");
-  const [isPasteValid, setIsPasteValid] = useState<boolean | null>(null);
-
   // Cargar Familias al iniciar
   useEffect(() => {
     if (show) {
@@ -201,8 +198,6 @@ export default function ConfigureSetup({
     setBase("");
     setBaseBks([]);
     setIsBaseValid(null);
-    setPaste("");
-    setIsPasteValid(null);
 
     onHide();
   };
@@ -216,8 +211,7 @@ export default function ConfigureSetup({
       !isStencilBottomValid ||
       !isSqueegeeFrontValid ||
       !isSqueegeeRearValid ||
-      !isBaseValid ||
-      !isPasteValid
+      !isBaseValid
     ) {
       toast.error(
         "Por favor, asegúrate de que todos los herramentales principales estén validados en verde.",
@@ -265,7 +259,6 @@ export default function ConfigureSetup({
           base_bk1: baseBks[0] || null,
           base_bk2: baseBks[1] || null,
           base_bk3: baseBks[2] || null,
-          paste: paste.toUpperCase(),
         },
       ]);
 
@@ -737,41 +730,6 @@ export default function ConfigureSetup({
                 </Button>
               </InputGroup>
             ))}
-          </div>
-
-          {/* PASTA DE SOLDADURA */}
-          <div className="mb-3">
-            <Form.Group>
-              <Form.Label className="fw-semibold">
-                Pasta de Soldadura (Única)
-              </Form.Label>
-              <InputGroup>
-                <Form.Control
-                  type="text"
-                  placeholder="Escanee o ingrese DMC de la Pasta..."
-                  value={paste}
-                  onChange={(e) => setPaste(e.target.value)}
-                  onBlur={() =>
-                    validateTooling(paste, "pasta", setIsPasteValid)
-                  }
-                  className={getValidationClass(isPasteValid)}
-                  required
-                />
-                {isPasteValid === true && (
-                  <InputGroup.Text className="bg-success text-white">
-                    <Check size={16} />
-                  </InputGroup.Text>
-                )}
-                {isPasteValid === false && (
-                  <InputGroup.Text className="bg-danger text-white">
-                    X
-                  </InputGroup.Text>
-                )}
-              </InputGroup>
-              <Form.Text className="text-muted">
-                Las pastas no manejan backups de repuesto en el setup.
-              </Form.Text>
-            </Form.Group>
           </div>
         </Modal.Body>
 
